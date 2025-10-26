@@ -1,0 +1,110 @@
+/* Artist page specific styles */
+.artist-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 30px 0;
+    padding: 30px;
+    background-color: var(--surface);
+    border-radius: 8px;
+}
+
+.artist-image-large img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.artist-name-large {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.artist-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat {
+    padding: 8px 16px;
+    background-color: var(--background);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background-color: var(--surface);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.track-item:hover {
+    background-color: rgba(108, 11, 169, 0.1);
+}
+
+.track-number {
+    width: 30px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.track-info {
+    flex-grow: 1;
+}
+
+.track-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 16px;
+}
+
+.track-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.no-tracks {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .artist-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .artist-image-large img {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .artist-name-large {
+        font-size: 28px;
+    }
+    
+    .artist-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .track-item {
+        padding: 10px;
+    }
+    
+    .track-number {
+        margin-right: 10px;
+    }
+}

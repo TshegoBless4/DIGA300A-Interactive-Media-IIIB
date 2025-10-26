@@ -8,10 +8,12 @@
     background-color: var(--surface);
     border-radius: 8px;
     transition: all 0.3s ease;
+    border-left: 4px solid var(--primary);
 }
 
 .track-item:hover {
     transform: translateX(5px);
+    background-color: var(--surface-hover);
 }
 
 .track-info {
@@ -22,16 +24,28 @@
     font-weight: bold;
     margin-bottom: 4px;
     font-size: 18px;
+    color: var(--text-primary);
 }
 
 .track-artist {
     color: var(--text-secondary);
     font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.track-date {
+    color: var(--text-secondary);
+    font-size: 12px;
+    opacity: 0.7;
 }
 
 .track-actions {
     display: flex;
     gap: 15px;
+}
+
+.favorite-btn.active {
+    color: var(--primary);
 }
 
 .empty-state {
@@ -43,11 +57,13 @@
 .empty-icon {
     font-size: 64px;
     margin-bottom: 20px;
+    opacity: 0.5;
 }
 
 .empty-state h3 {
     margin-bottom: 10px;
     color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
 }
 
 .empty-state p {
@@ -55,6 +71,7 @@
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
+    line-height: 1.5;
 }
 
 .no-results {
@@ -62,6 +79,12 @@
     padding: 40px;
     color: var(--text-secondary);
     font-style: italic;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
 }
 
 /* Mobile responsive */
@@ -74,5 +97,11 @@
     
     .track-actions {
         align-self: flex-end;
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .track-info {
+        width: 100%;
     }
 }

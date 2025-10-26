@@ -215,6 +215,8 @@ class VibeCheckAnimations {
             }
         });
 
+        
+
         document.addEventListener('mouseout', function(e) {
             if (e.target.classList.contains('icon-btn')) {
                 gsap.to(e.target, {

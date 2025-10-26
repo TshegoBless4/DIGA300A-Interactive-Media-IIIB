@@ -7,8 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Poppins:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="shared.css">
-    <link rel="stylesheet" href="artist.css">
+
+    <link rel="stylesheet" href="../Shared/shared.css">
+    <link rel="stylesheet" href="artist.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script src="../spotify-api.js"></script>
+    <script src="../Shared/animations.js"></script>
+
+    <script src="../Shared/shared.js"></script>
+    <script src="../Artist/artist.js"></script>
 </head>
 <body>
     <nav>
@@ -16,8 +26,9 @@
             <span class="logo-vibe">Vibe</span><span class="logo-check">Check</span>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html" class="nav-link">Home</a></li>
-            <li><a href="favorites.html" class="nav-link">My Favorites</a></li>
+            <li><a href="../index.html" class="nav-link">Home</a></li>
+            <li><a href="../Favourites/favorites.html" class="nav-link">My Favorites</a></li>
+            <!-- <li><a href="../Artist/artist.html" class="nav-link">Artist</a></li> -->
             <li><a href="about.html" class="nav-link">About</a></li>
         </ul>
     </nav>
@@ -31,7 +42,7 @@
             Error loading artist information. Please try again.
         </div>
 
-        <div id="artist-content" style="display: none;">
+        <div id="artist-content">
             <div class="artist-header">
                 <div class="artist-image-large">
                     <img src="https://via.placeholder.com/300" alt="Artist" id="artist-img">
@@ -49,6 +60,38 @@
             
             <div id="artist-tracks">
                 <!-- Tracks will be populated dynamically -->
+                <div class="track-item">
+                    <div class="track-number">1</div>
+                    <div class="track-info">
+                        <div class="track-title">Alright</div>
+                    </div>
+                    <div class="track-actions">
+                        <button class="icon-btn play-btn">▶</button>
+                        <button class="icon-btn favorite-btn">♥</button>
+                    </div>
+                </div>
+                
+                <div class="track-item">
+                    <div class="track-number">2</div>
+                    <div class="track-info">
+                        <div class="track-title">How To Pimp A Butterfly</div>
+                    </div>
+                    <div class="track-actions">
+                        <button class="icon-btn play-btn">▶</button>
+                        <button class="icon-btn favorite-btn">♥</button>
+                    </div>
+                </div>
+                
+                <div class="track-item">
+                    <div class="track-number">3</div>
+                    <div class="track-info">
+                        <div class="track-title">Poetic Justice</div>
+                    </div>
+                    <div class="track-actions">
+                        <button class="icon-btn play-btn">▶</button>
+                        <button class="icon-btn favorite-btn">♥</button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -57,11 +100,6 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="spotify-api.js"></script>
-    <script src="animations.js"></script>
-    <script src="shared.js"></script>
-    <script src="artist.js"></script>
+    
 </body>
 </html>
