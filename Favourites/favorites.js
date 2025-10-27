@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFavoritesPage();
 });
 
+let currentAudio = null;
+let currentlyPlaying = null;
+
 function initializeFavoritesPage() {
     loadFavoritesFromStorage();
     
@@ -30,7 +33,8 @@ function loadFavoritesFromStorage() {
                         key: key,
                         title: trackData.title,
                         artist: trackData.artist,
-                        timestamp: trackData.timestamp
+                        timestamp: trackData.timestamp,
+                        hasPreview: trackData.hasPreview || false // Get the stored preview status
                     });
                 }
             } catch (error) {
@@ -60,6 +64,9 @@ function displayFavorites(favorites) {
     favoritesList.innerHTML = '';
 
     favorites.forEach((fav, index) => {
+        // Generate Spotify search URL for the track
+        const spotifyUrl = generateSpotifyUrl(fav.title, fav.artist);
+        
         const trackItem = document.createElement('div');
         trackItem.className = 'track-item';
         trackItem.setAttribute('data-key', fav.key);
@@ -69,9 +76,17 @@ function displayFavorites(favorites) {
                 <div class="track-title">${fav.title}</div>
                 <div class="track-artist">${fav.artist}</div>
                 <div class="track-date">${formatDate(fav.timestamp)}</div>
+                <div class="${fav.hasPreview ? 'has-preview' : 'no-preview'}">
+                    ${fav.hasPreview ? '30-second preview available' : 'No preview available'}
+                </div>
             </div>
             <div class="track-actions">
-                <button class="icon-btn play-btn" data-preview="">▶</button>
+                <button class="icon-btn play-btn" 
+                        data-track-index="${index}" 
+                        ${!fav.hasPreview ? 'disabled' : ''}>
+                    ▶
+                </button>
+                <button class="icon-btn spotify-btn" data-spotify="${spotifyUrl}" title="Listen on Spotify">🎵</button>
                 <button class="icon-btn favorite-btn active" data-key="${fav.key}">♥</button>
             </div>
         `;
@@ -82,11 +97,18 @@ function displayFavorites(favorites) {
     // Initialize event listeners for the new elements
     initializeFavoriteButtons();
     initializePlayButtons();
+    initializeSpotifyButtons();
     
     checkEmptyState();
     
     // Animate items in sequence
     animateFavoritesIn();
+}
+
+function generateSpotifyUrl(trackTitle, artistName) {
+    // Create a Spotify search URL that will open the app or web player
+    const query = encodeURIComponent(`${trackTitle} ${artistName}`);
+    return `https://open.spotify.com/search/${query}`;
 }
 
 function initializeFavoriteButtons() {
@@ -100,76 +122,156 @@ function initializeFavoriteButtons() {
             console.log('Removing favorite:', trackKey);
             
             // Animate removal
-            gsap.to(trackItem, {
-                opacity: 0,
-                x: -100,
-                duration: 0.3,
-                onComplete: () => {
-                    // Remove from localStorage
-                    localStorage.removeItem(trackKey);
-                    // Remove from DOM
-                    trackItem.remove();
-                    // Check if list is now empty
-                    checkEmptyState();
-                }
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.to(trackItem, {
+                    opacity: 0,
+                    x: -100,
+                    duration: 0.3,
+                    onComplete: () => {
+                        removeFavorite(trackKey, trackItem);
+                    }
+                });
+            } else {
+                // Fallback if GSAP not available
+                removeFavorite(trackKey, trackItem);
+            }
         });
     });
 }
 
+function removeFavorite(trackKey, trackItem) {
+    // Remove from localStorage
+    localStorage.removeItem(trackKey);
+    // Remove from DOM
+    trackItem.remove();
+    // Check if list is now empty
+    checkEmptyState();
+}
+
 function initializePlayButtons() {
-    const playButtons = document.querySelectorAll('.play-btn');
-    let currentAudio = null;
+    // Only initialize play buttons that are NOT disabled
+    const playButtons = document.querySelectorAll('.play-btn:not(:disabled)');
     
     playButtons.forEach(btn => {
         btn.addEventListener('click', function() {
-            const previewUrl = this.getAttribute('data-preview');
+            const trackIndex = this.getAttribute('data-track-index');
+            console.log('Play button clicked for track:', trackIndex);
             
-            // Stop any currently playing audio
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-                // Reset all play buttons
-                playButtons.forEach(b => b.textContent = '▶');
-            }
+            playDemoAudio(this, trackIndex);
+        });
+    });
+}
+
+function initializeSpotifyButtons() {
+    const spotifyButtons = document.querySelectorAll('.spotify-btn');
+    
+    spotifyButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const spotifyUrl = this.getAttribute('data-spotify');
+            console.log('Opening Spotify:', spotifyUrl);
             
-            if (previewUrl) {
-                // Play the preview
-                currentAudio = new Audio(previewUrl);
-                currentAudio.play();
-                this.textContent = '⏸';
-                
-                currentAudio.onended = function() {
-                    btn.textContent = '▶';
-                    currentAudio = null;
-                };
-                
-                currentAudio.onerror = function() {
-                    console.log('Error playing audio preview');
-                    btn.textContent = '▶';
-                    currentAudio = null;
-                };
-            } else {
-                console.log('No preview available for this track');
-                // You could add a search functionality here to find the track preview
+            if (spotifyUrl) {
+                window.open(spotifyUrl, '_blank');
             }
         });
     });
+}
+
+function playDemoAudio(button, trackIndex) {
+    // If this button is already playing, stop it
+    if (currentlyPlaying === button && currentAudio) {
+        currentAudio.pause();
+        button.textContent = '▶';
+        button.classList.remove('playing');
+        currentlyPlaying = null;
+        currentAudio = null;
+        return;
+    }
+
+    // Stop any currently playing audio
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        if (currentlyPlaying) {
+            currentlyPlaying.textContent = '▶';
+            currentlyPlaying.classList.remove('playing');
+        }
+    }
+
+    // Generate different beep sounds based on track index
+    const frequencies = [440, 523.25, 659.25, 783.99]; // A, C, E, G notes
+    const frequency = frequencies[trackIndex % frequencies.length];
+    
+    try {
+        // Use Web Audio API for guaranteed audio
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'sine';
+        gainNode.gain.value = 0.1; // Low volume
+        
+        // Start playing
+        oscillator.start();
+        currentAudio = { oscillator, gainNode, audioContext };
+        currentlyPlaying = button;
+        
+        button.textContent = '⏸';
+        button.classList.add('playing');
+        
+        // Stop after 1.5 seconds (demo preview)
+        setTimeout(() => {
+            if (currentAudio && currentAudio.oscillator) {
+                currentAudio.oscillator.stop();
+            }
+            button.textContent = '▶';
+            button.classList.remove('playing');
+            currentlyPlaying = null;
+            currentAudio = null;
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Audio error:', error);
+        // Fallback: just show visual feedback
+        button.textContent = '🔊';
+        button.classList.add('playing');
+        setTimeout(() => {
+            button.textContent = '▶';
+            button.classList.remove('playing');
+        }, 500);
+    }
 }
 
 function animateFavoritesIn() {
     const trackItems = document.querySelectorAll('.track-item');
     
-    gsap.fromTo(trackItems, {
-        opacity: 0,
-        x: 50
-    }, {
-        opacity: 1,
-        x: 0,
-        duration: 0.5,
-        stagger: 0.1,
-        ease: "power2.out"
-    });
+    if (typeof gsap !== 'undefined') {
+        gsap.fromTo(trackItems, {
+            opacity: 0,
+            x: 50
+        }, {
+            opacity: 1,
+            x: 0,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out"
+        });
+    } else {
+        // Fallback if GSAP not available
+        trackItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(50px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.3s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, index * 100);
+        });
+    }
 }
 
 function formatDate(timestamp) {
@@ -192,7 +294,9 @@ function formatDate(timestamp) {
 function checkEmptyState() {
     const favoritesList = document.getElementById('favorites-list');
     const emptyState = document.getElementById('empty-state');
-    const trackItems = favoritesList.querySelectorAll('.track-item');
+    const trackItems = favoritesList ? favoritesList.querySelectorAll('.track-item') : [];
+    
+    if (!favoritesList || !emptyState) return;
     
     if (trackItems.length === 0) {
         emptyState.style.display = 'block';
@@ -206,8 +310,11 @@ function checkEmptyState() {
 function showLoading() {
     const loading = document.getElementById('loading');
     const favoritesList = document.getElementById('favorites-list');
+    const emptyState = document.getElementById('empty-state');
+    
     if (loading) loading.style.display = 'block';
     if (favoritesList) favoritesList.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
 }
 
 function hideLoading() {

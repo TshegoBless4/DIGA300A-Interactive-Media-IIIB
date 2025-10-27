@@ -1,4 +1,4 @@
-/* Artist page specific styles */
+ /* Artist page specific styles */
 .artist-header {
     display: flex;
     align-items: center;
@@ -66,6 +66,11 @@
     font-size: 16px;
 }
 
+.track-album {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
 .track-actions {
     display: flex;
     gap: 10px;
@@ -76,6 +81,77 @@
     padding: 40px;
     color: var(--text-secondary);
     font-style: italic;
+}
+
+/* Preview status styles */
+.has-preview {
+    font-size: 0.7em;
+    color: var(--secondary, #00DDFF);
+    background: rgba(0, 221, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+.no-preview {
+    font-size: 0.7em;
+    color: var(--text-secondary, #B3B3B3);
+    font-style: italic;
+    margin-top: 2px;
+}
+
+/* Button styles */
+.spotify-btn {
+    background: #1DB954;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.spotify-btn:hover {
+    background: #1ed760;
+    transform: scale(1.1);
+}
+
+.play-btn:hover:not(:disabled) {
+    color: var(--secondary, #00DDFF);
+    transform: scale(1.1);
+}
+
+.play-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.track-item.playing {
+    background-color: rgba(108, 123, 169, 0.1);
+    border-left: 3px solid var(--secondary, #00DDFF);
+}
+
+/* Loading and error states */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.error-message {
+    background-color: var(--error);
+    color: var(--text-1);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
 }
 
 /* Mobile responsive */
@@ -102,9 +178,25 @@
     
     .track-item {
         padding: 10px;
+        flex-wrap: wrap;
     }
     
     .track-number {
         margin-right: 10px;
+    }
+    
+    .track-actions {
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    /* Hide some elements on mobile to save space */
+    .track-album {
+        font-size: 12px;
+    }
+    
+    .has-preview, .no-preview {
+        font-size: 0.6em;
     }
 }
