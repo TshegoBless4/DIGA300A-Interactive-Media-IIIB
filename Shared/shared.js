@@ -1,17 +1,61 @@
 // Common functionality shared across all pages
+
+// Enhanced navigation initialization
 function initializeNavigation() {
     // Set active navigation link based on current page
-    const currentPage = window.location.pathname.split('/').pop();
+    const currentPage = getCurrentPage();
     const navLinks = document.querySelectorAll('.nav-link');
     
     navLinks.forEach(link => {
-        const linkPage = link.getAttribute('href');
+        const linkPage = getPageFromHref(link.getAttribute('href'));
+        
         if (linkPage === currentPage) {
             link.classList.add('active');
         } else {
             link.classList.remove('active');
         }
     });
+}
+
+function getCurrentPage() {
+    const path = window.location.pathname;
+    const filename = path.split('/').pop();
+    const fullPath = window.location.href;
+    
+    // Handle different page scenarios
+    if (filename === 'favorites.html' || path.includes('favorites.html') || fullPath.includes('favorites.html')) {
+        return 'favorites';
+    } else if (filename === 'about.html' || path.includes('about.html') || fullPath.includes('about.html')) {
+        return 'about';
+    } else if (filename === 'artist.html' || path.includes('artist.html') || fullPath.includes('artist.html')) {
+        return 'artist';
+    } else if (filename === 'index.html' || filename === '' || path.endsWith('/') || fullPath.endsWith('index.html')) {
+        return 'home';
+    }
+    
+    // Additional fallback: check if we're in the root directory
+    if (path === '/' || path.endsWith('/VibeCheck/') || !filename) {
+        return 'home';
+    }
+    
+    return 'home'; // Default fallback
+}
+
+function getPageFromHref(href) {
+    if (!href) return '';
+    
+    // Handle different href formats
+    if (href.includes('favorites.html') || href.includes('/Favourites/')) {
+        return 'favorites';
+    } else if (href.includes('about.html') || href.includes('/About/')) {
+        return 'about';
+    } else if (href.includes('artist.html') || href.includes('/Artist/')) {
+        return 'artist';
+    } else if (href.includes('index.html') || href === '../' || href === './' || href === '/' || href === '' || href.includes('../index.html')) {
+        return 'home';
+    }
+    
+    return ''; // Unknown page
 }
 
 function initializeFavoriteButtons() {
