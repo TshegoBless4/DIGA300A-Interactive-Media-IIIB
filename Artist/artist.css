@@ -199,4 +199,61 @@
     .has-preview, .no-preview {
         font-size: 0.6em;
     }
+
+    /* Add to existing artist.css - Music Visualization */
+.music-visualization {
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.audio-wave {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.wave-path {
+    filter: drop-shadow(0 0 8px var(--primary));
+}
+
+/* Load More button styles */
+.load-more-tracks {
+    display: block;
+    margin: 30px auto;
+    padding: 12px 24px;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 160px;
+}
+
+.load-more-tracks:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 11, 169, 0.3);
+}
+
+/* Mobile responsive for new elements */
+@media (max-width: 768px) {
+    .music-visualization {
+        margin: 20px 0;
+        padding: 15px;
+    }
+    
+    .load-more-tracks {
+        padding: 10px 20px;
+        font-size: 14px;
+        min-width: 140px;
+    }
+}
+    
+    
 }

@@ -134,4 +134,38 @@
     .mission-section {
         padding: 20px;
     }
+
+    /* About Visualization */
+.about-visualization {
+    margin: 20px 0 40px 0;
+    padding: 20px;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.music-flow {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.flow-path {
+    filter: drop-shadow(0 0 6px var(--primary));
+}
+
+.flow-dot {
+    filter: drop-shadow(0 0 4px var(--secondary));
+}
+
+.music-note {
+    filter: drop-shadow(0 0 4px var(--primary));
+}
+
+/* Mobile responsive for new elements */
+@media (max-width: 768px) {
+    .about-visualization {
+        margin: 15px 0 30px 0;
+        padding: 15px;
+    }
+}
 }

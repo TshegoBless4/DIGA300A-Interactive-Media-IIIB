@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeAboutPage() {
     // Add any about page specific functionality here
     console.log('About page initialized');
+
     
     // Initialize animations
-    VibeCheckAnimations.initAboutAnimations();
+    if (typeof VibeCheckAnimations !== 'undefined') {
+    VibeCheckAnimations.initAboutAnimations(); }
     
     // Add animation to feature cards on scroll
     const featureCards = document.querySelectorAll('.feature-card');

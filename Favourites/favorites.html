@@ -13,6 +13,7 @@
      
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
 
     <script src="../spotify-api.js"></script>
     <script src="../Shared/animations.js"></script>
@@ -28,13 +29,22 @@
         <ul class="nav-links">
             <li><a href="../index.html" class="nav-link">Home</a></li>
             <li><a href="../Favourites/favorites.html" class="nav-link">My Favorites</a></li>
-            <!-- <li><a href="../Artist/artist.html" class="nav-link">Artist</a></li> -->
             <li><a href="../About/about.html" class="nav-link">About</a></li>
         </ul>
     </nav>
     
     <div class="container">
         <h1 class="page-title">My Favorites</h1>
+        
+        <!-- ADD THIS: SVG Music Visualization -->
+        <div class="favorites-visualization">
+            <svg class="heart-wave" width="100%" height="80" viewBox="0 0 400 60">
+                <path class="heart-path" d="M0,30 Q50,10 100,30 T200,30 T300,30" 
+                      stroke="var(--primary)" stroke-width="2" fill="none"/>
+                <path class="floating-heart" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                      fill="var(--primary)" transform="scale(0.3)"/>
+            </svg>
+        </div>
         
         <div id="loading" class="loading" style="display: none;">
             Loading your favorites...

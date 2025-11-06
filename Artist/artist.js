@@ -10,6 +10,10 @@ async function initializeArtistPage() {
     const artistName = urlParams.get('artistName');
     
     console.log('URL Parameters:', { artistId, artistName });
+    
+    if (typeof VibeCheckAnimations !== 'undefined') {
+        VibeCheckAnimations.initArtistAnimations();
+    }
 
     if (artistId && artistId !== 'demo') {
         console.log('Loading artist by ID:', artistId);

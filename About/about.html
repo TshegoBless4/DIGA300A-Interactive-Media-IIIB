@@ -12,6 +12,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
 
     <script src="../spotify-api.js"></script>
     <script src="../Shared/animations.js"></script>
@@ -32,6 +33,17 @@
     
     <div class="container">
         <h1 class="page-title">About VibeCheck</h1>
+        
+        <!-- ADD THIS: About Visualization -->
+        <div class="about-visualization">
+            <svg class="music-flow" width="100%" height="100" viewBox="0 0 400 80">
+                <path class="flow-path" d="M0,40 Q100,20 200,40 T400,40" 
+                      stroke="var(--primary)" stroke-width="3" fill="none"/>
+                <circle class="flow-dot" cx="0" cy="40" r="5" fill="var(--secondary)"/>
+                <path class="music-note" d="M12 3v10.26c-.5-.17-1-.26-1.5-.26C8.57 13 7 14.57 7 16.5S8.57 20 10.5 20s3.5-1.57 3.5-3.5V7h4V3h-6z" 
+                      fill="var(--primary)" transform="scale(1.2)"/>
+            </svg>
+        </div>
         
         <div class="about-content">
             <div class="about-hero">
@@ -91,7 +103,5 @@
             <div class="spotify-badge">Powered by Spotify</div>
         </div>
     </div>
-
-    
 </body>
 </html>

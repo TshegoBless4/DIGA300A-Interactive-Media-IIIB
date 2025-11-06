@@ -166,6 +166,47 @@ class SpotifyAPI {
             throw error;
         }
     }
+    // Add these methods to your SpotifyAPI class:
+
+async getArtistAlbums(artistId, limit = 20) {
+    try {
+        const token = await this.getAccessToken();
+        const response = await fetch(`${this.baseURL}/artists/${artistId}/albums?limit=${limit}&market=US`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Get artist albums failed! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(' Get artist albums error:', error.message);
+        throw error;
+    }
+}
+
+async getAlbumTracks(albumId) {
+    try {
+        const token = await this.getAccessToken();
+        const response = await fetch(`${this.baseURL}/albums/${albumId}/tracks?market=US`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Get album tracks failed! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(' Get album tracks error:', error.message);
+        throw error;
+    }
+}
 }
 
 // Create global instance

@@ -121,31 +121,39 @@ function initializeFavoriteButtons() {
             
             console.log('Removing favorite:', trackKey);
             
-            // Animate removal
-            if (typeof gsap !== 'undefined') {
-                gsap.to(trackItem, {
-                    opacity: 0,
-                    x: -100,
-                    duration: 0.3,
-                    onComplete: () => {
-                        removeFavorite(trackKey, trackItem);
-                    }
-                });
-            } else {
-                // Fallback if GSAP not available
-                removeFavorite(trackKey, trackItem);
-            }
+            // Enhanced removal animation with GSAP
+            removeFavorite(trackKey, trackItem);
         });
     });
 }
 
 function removeFavorite(trackKey, trackItem) {
-    // Remove from localStorage
-    localStorage.removeItem(trackKey);
-    // Remove from DOM
-    trackItem.remove();
-    // Check if list is now empty
-    checkEmptyState();
+    // Enhanced removal animation with GSAP
+    if (typeof gsap !== 'undefined') {
+        gsap.to(trackItem, {
+            opacity: 0,
+            x: -100,
+            height: 0,
+            marginBottom: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            duration: 0.4,
+            ease: "power2.in",
+            onComplete: () => {
+                // Remove from localStorage
+                localStorage.removeItem(trackKey);
+                // Remove from DOM
+                trackItem.remove();
+                // Check if list is now empty
+                checkEmptyState();
+            }
+        });
+    } else {
+        // Fallback if GSAP not available
+        localStorage.removeItem(trackKey);
+        trackItem.remove();
+        checkEmptyState();
+    }
 }
 
 function initializePlayButtons() {
