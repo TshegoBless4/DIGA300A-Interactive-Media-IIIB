@@ -63,11 +63,37 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
+    user-select: none; /* Prevent text selection */
+    -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For IE/Edge */
+    outline: none; /* Remove focus outline */
+    border: 2px solid transparent; /* Prepare for active state */
 }
 
 .genre-pill:hover {
     background-color: var(--primary);
     color: white;
+}
+
+.genre-pill.active {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 11, 169, 0.4);
+    border-color: var(--primary);
+}
+
+.genre-pill.active:hover {
+    background-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* Remove any focus states that might cause blinking cursor */
+.genre-pill:focus,
+.genre-pill:focus-visible {
+    outline: none;
+    box-shadow: none;
 }
 
 .artist-grid {
@@ -102,28 +128,6 @@
     margin-top: 4px;
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 36px;
-    }
-    
-    .search-bar {
-        flex-direction: column;
-    }
-    
-    .search-input {
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    
-    .search-button {
-        border-radius: 4px;
-    }
-    
-    .artist-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    }
 /* Next button styles */
 .next-button-container {
     text-align: center;
@@ -167,6 +171,7 @@
     grid-column: 1 / -1;
     padding: 40px;
 }
+
 /* Music Pulse SVG Animation */
 .music-pulse {
     margin: 30px 0;
@@ -185,5 +190,27 @@
 .sound-dot {
     filter: drop-shadow(0 0 4px var(--secondary));
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 36px;
+    }
     
+    .search-bar {
+        flex-direction: column;
+    }
+    
+    .search-input {
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .search-button {
+        border-radius: 4px;
+    }
+    
+    .artist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
 }

@@ -21,7 +21,7 @@ function setupNextButton() {
     
     const nextButton = document.createElement('button');
     nextButton.className = 'btn btn-primary next-button';
-    nextButton.textContent = 'Next Artists →';
+    nextButton.textContent = 'Next';
     nextButton.style.display = 'none';
     nextButton.addEventListener('click', loadNextGenreArtists);
     
@@ -35,8 +35,9 @@ async function loadPopularArtists() {
     try {
         const popularArtistIds = await getRandomPopularArtists();
         const data = await spotifyAPI.getSeveralArtists(popularArtistIds);
-        displayArtistResults(data.artists, 'Popular Artists');
+        displayArtistResults(data.artists, 'Popular');
         hideNextButton(); // Hide next button for popular artists
+        resetGenrePills(); // Reset genre pills when showing popular artists
     } catch (error) {
         console.log('Using demo popular artists');
         const demoArtists = [
@@ -49,6 +50,7 @@ async function loadPopularArtists() {
         ];
         displayArtistResults(demoArtists, 'Popular Artists');
         hideNextButton();
+        resetGenrePills();
     }
 }
 
@@ -123,6 +125,9 @@ async function handleGenreSelection(genre) {
     currentGenre = genre;
     currentOffset = 0; // Reset offset for new genre
     
+    // Set active state on genre pill
+    setActiveGenrePill(genre);
+    
     try {
         const data = await spotifyAPI.searchByGenre(genre);
         
@@ -146,6 +151,28 @@ async function handleGenreSelection(genre) {
     } finally {
         hideLoading();
     }
+}
+
+// NEW: Function to set active state on genre pill
+function setActiveGenrePill(genre) {
+    const genrePills = document.querySelectorAll('.genre-pill');
+    
+    genrePills.forEach(pill => {
+        if (pill.textContent === genre) {
+            pill.classList.add('active');
+        } else {
+            pill.classList.remove('active');
+        }
+    });
+}
+
+// NEW: Function to reset all genre pills (remove active state)
+function resetGenrePills() {
+    const genrePills = document.querySelectorAll('.genre-pill');
+    genrePills.forEach(pill => {
+        pill.classList.remove('active');
+    });
+    currentGenre = null;
 }
 
 async function loadNextGenreArtists() {
@@ -291,6 +318,7 @@ async function handleSearch() {
     showLoading();
     hideError();
     hideNextButton(); // Hide next button for text search
+    resetGenrePills(); // Reset genre pills when doing text search
 
     try {
         const data = await spotifyAPI.searchArtists(query);
