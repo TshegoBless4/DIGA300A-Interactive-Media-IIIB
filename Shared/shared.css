@@ -188,4 +188,23 @@ nav {
     .page-title {
         font-size: 28px;
     }
+
+    /* Back button styles */
+.btn-secondary {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text-secondary);
+    color: var(--background);
+    transform: translateY(-2px);
+}
 }

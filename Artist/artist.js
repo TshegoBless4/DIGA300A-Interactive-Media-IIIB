@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function initializeArtistPage() {
+    // Setup back button functionality FIRST
+    setupArtistBackButton();
+    
     const urlParams = new URLSearchParams(window.location.search);
     const artistId = urlParams.get('artistId');
     const artistName = urlParams.get('artistName');
@@ -24,6 +27,48 @@ async function initializeArtistPage() {
     } else {
         console.log('No artist specified, showing default state');
         showDefaultState();
+    }
+}
+
+// UPDATED: Simplified back button with just <
+function setupArtistBackButton() {
+    // Create back button if it doesn't exist
+    let backButton = document.getElementById('back-button');
+    
+    if (!backButton) {
+        backButton = document.createElement('button');
+        backButton.id = 'back-button';
+        backButton.className = 'btn btn-secondary back-button';
+        backButton.innerHTML = '&lt;'; // Just the < symbol
+        backButton.title = 'Back to Previous Page';
+        backButton.style.cssText = `
+            margin-bottom: 20px; 
+            margin-top: 20px;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: bold;
+        `;
+        
+        // Insert at the top of the container
+        const container = document.querySelector('.container');
+        const firstChild = container.firstChild;
+        container.insertBefore(backButton, firstChild);
+    }
+    
+    backButton.addEventListener('click', function() {
+        // Navigate back to home with history state
+        window.location.href = '../index.html?fromBack=true';
+    });
+    
+    // Also support browser back button
+    window.addEventListener('popstate', function() {
+        window.location.href = '../index.html?fromBack=true';
+    });
+    
+    // Add history state when arriving at artist page
+    if (window.history && window.history.replaceState) {
+        const currentUrl = window.location.href;
+        window.history.replaceState({ fromArtist: true }, '', currentUrl);
     }
 }
 

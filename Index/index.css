@@ -213,4 +213,64 @@
     .artist-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
+    /* Navigation buttons styles */
+.navigation-buttons-container {
+    text-align: center;
+    margin: 40px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.previous-button, .next-button {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.previous-button:hover, .next-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 11, 169, 0.3);
+}
+
+/* Back button specific style */
+.back-button {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: var(--text-secondary);
+    color: var(--background);
+    transform: translateY(-2px);
+}
+
+/* Mobile responsive for navigation buttons */
+@media (max-width: 768px) {
+    .navigation-buttons-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .previous-button, .next-button {
+        width: 200px;
+    }
+    
+    .back-button {
+        padding: 8px 12px;
+        font-size: 16px;
+    }
+}
 }

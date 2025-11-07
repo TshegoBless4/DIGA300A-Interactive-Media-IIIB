@@ -7,28 +7,325 @@ let currentGenre = null;
 let currentOffset = 0;
 const ARTISTS_PER_PAGE = 6;
 
+// NEW: Navigation history management
+let navigationHistory = [];
+let currentPageState = null;
+let genreHistory = []; // NEW: Track genre navigation history
+
 async function initializeHomePage() {
     setupSearch();
     setupGenres();
     setupAnimations();
-    setupNextButton();
-    await loadPopularArtists();
+    setupNavigationButtons(); // UPDATED: Now sets up both next and previous
+    setupBackButton();
+    setupBrowserBackButton();
+    
+    // Check if we should restore state or load popular artists
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('fromBack') && navigationHistory.length > 0) {
+        const previousState = navigationHistory.pop();
+        restoreState(previousState);
+    } else {
+        await loadPopularArtists();
+    }
 }
 
-function setupNextButton() {
-    const nextButtonContainer = document.createElement('div');
-    nextButtonContainer.className = 'next-button-container';
+// NEW: Navigation history functions
+function saveCurrentState() {
+    const state = {
+        genre: currentGenre,
+        offset: currentOffset,
+        artists: getCurrentDisplayedArtists(),
+        searchTerm: document.querySelector('.search-input')?.value || '',
+        page: 'home'
+    };
+    currentPageState = state;
+}
+
+function getCurrentDisplayedArtists() {
+    const artistCards = document.querySelectorAll('.artist-card');
+    const artists = [];
     
+    // Use forEach to maintain the exact order from the DOM
+    artistCards.forEach(card => {
+        const name = card.querySelector('.artist-name')?.textContent;
+        const genre = card.querySelector('.artist-genre')?.textContent;
+        const image = card.querySelector('.artist-image')?.src;
+        const artistId = card.getAttribute('data-artist-id');
+        
+        if (name) {
+            artists.push({ name, genre, image, id: artistId });
+        }
+    });
+    
+    return artists;
+}
+
+function pushToHistory(state) {
+    navigationHistory.push(JSON.parse(JSON.stringify(state))); // Deep clone
+    // Keep only last 10 history items to prevent memory issues
+    if (navigationHistory.length > 10) {
+        navigationHistory.shift();
+    }
+    console.log('History updated:', navigationHistory.length, 'items');
+}
+
+function setupBackButton() {
+    // Check if we're coming from a back navigation
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromBack = urlParams.get('fromBack');
+    
+    if (fromBack && navigationHistory.length > 0) {
+        const previousState = navigationHistory.pop();
+        restoreState(previousState);
+    }
+}
+
+function restoreState(state) {
+    if (!state) return;
+    
+    currentGenre = state.genre;
+    currentOffset = state.offset;
+    
+    // Restore search input if it exists
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput && state.searchTerm) {
+        searchInput.value = state.searchTerm;
+    }
+    
+    // Re-display artists
+    if (state.artists && state.artists.length > 0) {
+        displayArtistResultsFromState(state.artists, state.genre);
+    }
+    
+    // Update genre pill active state
+    if (state.genre) {
+        setActiveGenrePill(state.genre);
+        showNextButton();
+    } else {
+        resetGenrePills();
+        hideNextButton();
+    }
+}
+
+function displayArtistResultsFromState(artists, genre) {
+    const resultsContainer = document.getElementById('search-results');
+    resultsContainer.innerHTML = '';
+
+    if (genre && genre !== 'Popular') {
+        const genreTitle = document.createElement('h3');
+        genreTitle.className = 'section-title';
+        genreTitle.textContent = `${genre} Artists`;
+        resultsContainer.appendChild(genreTitle);
+    }
+
+    // Display artists in the exact order they were saved
+    artists.forEach(artist => {
+        const artistCard = document.createElement('div');
+        artistCard.className = 'artist-card card';
+        artistCard.setAttribute('data-artist-id', artist.id || '');
+        
+        const displayGenre = genre || artist.genre || 'Music';
+        const imageUrl = artist.image || 'https://via.placeholder.com/200';
+        
+        artistCard.innerHTML = `
+            <img src="${imageUrl}" alt="${artist.name}" class="artist-image">
+            <div class="artist-name">${artist.name}</div>
+            <div class="artist-genre">${displayGenre}</div>
+        `;
+        
+        artistCard.addEventListener('click', function() {
+            saveCurrentState();
+            pushToHistory(currentPageState);
+            navigateToArtist(artist.id, artist.name);
+        });
+        
+        resultsContainer.appendChild(artistCard);
+    });
+}
+
+function setupBrowserBackButton() {
+    window.addEventListener('popstate', function(event) {
+        if (navigationHistory.length > 0) {
+            const previousState = navigationHistory.pop();
+            restoreState(previousState);
+        } else {
+            // If no history, go to popular artists
+            loadPopularArtists();
+        }
+    });
+}
+
+// UPDATED: Setup both next and previous buttons
+function setupNavigationButtons() {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'navigation-buttons-container';
+    
+    // Previous button
+    const previousButton = document.createElement('button');
+    previousButton.className = 'btn btn-secondary previous-button';
+    previousButton.innerHTML = '← Previous';
+    previousButton.style.display = 'none';
+    previousButton.addEventListener('click', loadPreviousGenreArtists);
+    
+    // Next button
     const nextButton = document.createElement('button');
     nextButton.className = 'btn btn-primary next-button';
-    nextButton.textContent = 'Next';
+    nextButton.textContent = 'Next →';
     nextButton.style.display = 'none';
     nextButton.addEventListener('click', loadNextGenreArtists);
     
-    nextButtonContainer.appendChild(nextButton);
+    buttonContainer.appendChild(previousButton);
+    buttonContainer.appendChild(nextButton);
     
     const resultsContainer = document.getElementById('search-results');
-    resultsContainer.parentNode.insertBefore(nextButtonContainer, resultsContainer.nextSibling);
+    resultsContainer.parentNode.insertBefore(buttonContainer, resultsContainer.nextSibling);
+}
+
+// NEW: Previous button functionality for genre navigation
+async function loadPreviousGenreArtists() {
+    if (genreHistory.length <= 1) {
+        // If no previous state, reload the initial genre search
+        if (currentGenre) {
+            await handleGenreSelection(currentGenre);
+        }
+        return;
+    }
+    
+    // Remove current state
+    genreHistory.pop();
+    
+    // Get previous state
+    const previousState = genreHistory[genreHistory.length - 1];
+    
+    if (previousState) {
+        showLoading();
+        hideError();
+        
+        currentGenre = previousState.genre;
+        currentOffset = previousState.offset;
+        
+        setActiveGenrePill(currentGenre);
+        
+        try {
+            // Use the search terms from previous state
+            const searchQuery = previousState.searchQuery || `genre:${currentGenre}`;
+            const data = await spotifyAPI.searchArtists(searchQuery);
+            
+            if (data.artists?.items && data.artists.items.length > 0) {
+                displayArtistResults(data.artists.items, currentGenre);
+            } else {
+                // Fallback to demo data
+                showDemoGenreResults(currentGenre);
+            }
+            
+            updateNavigationButtons();
+            
+        } catch (error) {
+            console.error('Previous genre artists error:', error);
+            showDemoGenreResults(currentGenre);
+            updateNavigationButtons();
+        } finally {
+            hideLoading();
+        }
+    }
+}
+
+// UPDATED: Save state when loading next artists
+async function loadNextGenreArtists() {
+    if (!currentGenre) return;
+    
+    showLoading();
+    hideError();
+    
+    // Save current state to genre history before loading next
+    const currentState = {
+        genre: currentGenre,
+        offset: currentOffset,
+        searchQuery: `genre:${currentGenre}`,
+        artists: getCurrentDisplayedArtists()
+    };
+    genreHistory.push(currentState);
+    
+    try {
+        // Use offset to get different results
+        const randomTerms = getRandomSearchTerms(currentGenre);
+        const randomTerm = randomTerms[Math.floor(Math.random() * randomTerms.length)];
+        
+        const searchQuery = `genre:${currentGenre} ${randomTerm}`;
+        const data = await spotifyAPI.searchArtists(searchQuery);
+        
+        if (data.artists?.items && data.artists.items.length > 0) {
+            displayArtistResults(data.artists.items, currentGenre);
+            
+            // Update current state with new search query
+            if (genreHistory.length > 0) {
+                genreHistory[genreHistory.length - 1].searchQuery = searchQuery;
+            }
+        } else {
+            // Fallback to regular genre search
+            const genreData = await spotifyAPI.searchByGenre(currentGenre);
+            const artistIds = extractArtistIdsFromTracks(genreData.tracks.items);
+            if (artistIds.length > 0) {
+                await displayArtistsFromIds(artistIds, currentGenre);
+            } else {
+                throw new Error('No artists found');
+            }
+        }
+        
+        updateNavigationButtons();
+        
+    } catch (error) {
+        console.error('Next genre artists error:', error);
+        showDemoGenreResults(currentGenre);
+        updateNavigationButtons();
+    } finally {
+        hideLoading();
+    }
+}
+
+// NEW: Update navigation buttons visibility
+function updateNavigationButtons() {
+    const previousButton = document.querySelector('.previous-button');
+    const nextButton = document.querySelector('.next-button');
+    
+    if (previousButton) {
+        previousButton.style.display = genreHistory.length > 1 ? 'inline-block' : 'none';
+    }
+    
+    if (nextButton) {
+        nextButton.style.display = currentGenre ? 'inline-block' : 'none';
+    }
+}
+
+// UPDATED: Hide both navigation buttons
+function hideNavigationButtons() {
+    const previousButton = document.querySelector('.previous-button');
+    const nextButton = document.querySelector('.next-button');
+    
+    if (previousButton) previousButton.style.display = 'none';
+    if (nextButton) nextButton.style.display = 'none';
+    
+    // Reset genre history
+    genreHistory = [];
+}
+
+// UPDATED: Show next button only (for backward compatibility)
+function showNextButton() {
+    const nextButton = document.querySelector('.next-button');
+    if (nextButton) {
+        nextButton.style.display = 'inline-block';
+    }
+    updateNavigationButtons();
+}
+
+// UPDATED: Hide next button only (for backward compatibility)
+function hideNextButton() {
+    const nextButton = document.querySelector('.next-button');
+    if (nextButton) {
+        nextButton.style.display = 'none';
+    }
+    updateNavigationButtons();
 }
 
 async function loadPopularArtists() {
@@ -36,8 +333,11 @@ async function loadPopularArtists() {
         const popularArtistIds = await getRandomPopularArtists();
         const data = await spotifyAPI.getSeveralArtists(popularArtistIds);
         displayArtistResults(data.artists, 'Popular');
-        hideNextButton(); // Hide next button for popular artists
-        resetGenrePills(); // Reset genre pills when showing popular artists
+        hideNavigationButtons(); // UPDATED: Hide both buttons
+        resetGenrePills();
+        
+        // Save initial state
+        saveCurrentState();
     } catch (error) {
         console.log('Using demo popular artists');
         const demoArtists = [
@@ -49,8 +349,11 @@ async function loadPopularArtists() {
             { id: '6', name: 'Beyoncé', images: [{url: 'https://via.placeholder.com/200'}], genres: ['R&B'] }
         ];
         displayArtistResults(demoArtists, 'Popular Artists');
-        hideNextButton();
+        hideNavigationButtons(); // UPDATED: Hide both buttons
         resetGenrePills();
+        
+        // Save initial state
+        saveCurrentState();
     }
 }
 
@@ -118,12 +421,20 @@ function setupAnimations() {
     }
 }
 
+// UPDATED: Handle genre selection to reset history and show buttons
 async function handleGenreSelection(genre) {
     showLoading();
     hideError();
     
+    // Save current state before changing
+    saveCurrentState();
+    pushToHistory(currentPageState);
+    
+    // Reset genre history for new genre
+    genreHistory = [];
+    
     currentGenre = genre;
-    currentOffset = 0; // Reset offset for new genre
+    currentOffset = 0;
     
     // Set active state on genre pill
     setActiveGenrePill(genre);
@@ -135,7 +446,16 @@ async function handleGenreSelection(genre) {
             const artistIds = extractArtistIdsFromTracks(data.tracks.items);
             if (artistIds.length > 0) {
                 await displayArtistsFromIds(artistIds, genre);
-                showNextButton(); // Show next button for genre exploration
+                
+                // Save initial genre state
+                genreHistory.push({
+                    genre: genre,
+                    offset: 0,
+                    searchQuery: `genre:${genre}`,
+                    artists: getCurrentDisplayedArtists()
+                });
+                
+                updateNavigationButtons();
             } else {
                 throw new Error('No artists found in tracks');
             }
@@ -147,13 +467,22 @@ async function handleGenreSelection(genre) {
         console.error('Genre search error:', error);
         showError(`No ${genre} music found. Please try another genre.`);
         showDemoGenreResults(genre);
-        showNextButton(); // Still show next button for demo data
+        
+        // Save demo state to history
+        genreHistory.push({
+            genre: genre,
+            offset: 0,
+            searchQuery: `genre:${genre}`,
+            artists: getCurrentDisplayedArtists()
+        });
+        
+        updateNavigationButtons();
     } finally {
         hideLoading();
     }
 }
 
-// NEW: Function to set active state on genre pill
+// Function to set active state on genre pill
 function setActiveGenrePill(genre) {
     const genrePills = document.querySelectorAll('.genre-pill');
     
@@ -166,49 +495,13 @@ function setActiveGenrePill(genre) {
     });
 }
 
-// NEW: Function to reset all genre pills (remove active state)
+// Function to reset all genre pills (remove active state)
 function resetGenrePills() {
     const genrePills = document.querySelectorAll('.genre-pill');
     genrePills.forEach(pill => {
         pill.classList.remove('active');
     });
     currentGenre = null;
-}
-
-async function loadNextGenreArtists() {
-    if (!currentGenre) return;
-    
-    showLoading();
-    hideError();
-    
-    try {
-        // Use offset to get different results (Spotify search doesn't support offset well for genre search)
-        // So we'll use a different approach - search with random terms related to the genre
-        const randomTerms = getRandomSearchTerms(currentGenre);
-        const randomTerm = randomTerms[Math.floor(Math.random() * randomTerms.length)];
-        
-        const searchQuery = `genre:${currentGenre} ${randomTerm}`;
-        const data = await spotifyAPI.searchArtists(searchQuery);
-        
-        if (data.artists?.items && data.artists.items.length > 0) {
-            displayArtistResults(data.artists.items, currentGenre);
-        } else {
-            // Fallback to regular genre search
-            const genreData = await spotifyAPI.searchByGenre(currentGenre);
-            const artistIds = extractArtistIdsFromTracks(genreData.tracks.items);
-            if (artistIds.length > 0) {
-                await displayArtistsFromIds(artistIds, currentGenre);
-            } else {
-                throw new Error('No artists found');
-            }
-        }
-        
-    } catch (error) {
-        console.error('Next genre artists error:', error);
-        showDemoGenreResults(currentGenre); // Show different demo artists
-    } finally {
-        hideLoading();
-    }
 }
 
 function getRandomSearchTerms(genre) {
@@ -252,6 +545,7 @@ async function displayArtistsFromIds(artistIds, genre) {
     }
 }
 
+// FIXED: Removed the shuffle that was causing randomization
 function displayArtistResults(artists, genre = null) {
     const resultsContainer = document.getElementById('search-results');
     
@@ -269,12 +563,13 @@ function displayArtistResults(artists, genre = null) {
         resultsContainer.appendChild(genreTitle);
     }
 
-    // Only shuffle for genre exploration, not for search results
-    const artistsToDisplay = genre ? [...artists].sort(() => 0.5 - Math.random()) : artists;
+    // FIXED: Removed the shuffle - artists now display in API order consistently
+    const artistsToDisplay = artists;
     
     artistsToDisplay.forEach(artist => {
         const displayGenre = genre || artist.genres?.[0] || 'Music';
         const artistCard = createArtistCard(artist, displayGenre);
+        artistCard.setAttribute('data-artist-id', artist.id);
         resultsContainer.appendChild(artistCard);
     });
 
@@ -286,6 +581,7 @@ function displayArtistResults(artists, genre = null) {
 function createArtistCard(artist, genre) {
     const artistCard = document.createElement('div');
     artistCard.className = 'artist-card card';
+    artistCard.setAttribute('data-artist-id', artist.id);
     
     const imageUrl = artist.images?.[0]?.url || 'https://via.placeholder.com/200';
     
@@ -296,6 +592,8 @@ function createArtistCard(artist, genre) {
     `;
     
     artistCard.addEventListener('click', function() {
+        saveCurrentState();
+        pushToHistory(currentPageState);
         navigateToArtist(artist.id, artist.name);
     });
     
@@ -303,11 +601,15 @@ function createArtistCard(artist, genre) {
 }
 
 function navigateToArtist(artistId, artistName) {
-    const artistPageUrl = `Artist/artist.html?artistId=${artistId}&artistName=${encodeURIComponent(artistName)}`;
-    console.log('Navigating to:', artistPageUrl);
+    saveCurrentState();
+    pushToHistory(currentPageState);
+    
+    const artistPageUrl = `Artist/artist.html?artistId=${artistId}&artistName=${encodeURIComponent(artistName)}&fromHome=true`;
+    console.log('Navigating to artist:', artistName);
     window.location.href = artistPageUrl;
 }
 
+// UPDATED: Handle search to hide navigation buttons
 async function handleSearch() {
     const query = document.querySelector('.search-input').value.trim();
     if (!query) {
@@ -315,14 +617,21 @@ async function handleSearch() {
         return;
     }
 
+    // Save current state before searching
+    saveCurrentState();
+    pushToHistory(currentPageState);
+
     showLoading();
     hideError();
-    hideNextButton(); // Hide next button for text search
-    resetGenrePills(); // Reset genre pills when doing text search
+    hideNavigationButtons(); // UPDATED: Hide both buttons
+    resetGenrePills();
 
     try {
         const data = await spotifyAPI.searchArtists(query);
         displayArtistResults(data.artists.items);
+        
+        // Save search state
+        saveCurrentState();
     } catch (error) {
         console.error('Search error:', error);
         showError('Error searching for artists. Please try again.');
@@ -410,20 +719,6 @@ function getDemoArtistsByGenre(genre) {
         { id: 'demo-5', name: `${genre} Artist 5`, image: 'https://via.placeholder.com/200' },
         { id: 'demo-6', name: `${genre} Artist 6`, image: 'https://via.placeholder.com/200' }
     ];
-}
-
-function showNextButton() {
-    const nextButton = document.querySelector('.next-button');
-    if (nextButton) {
-        nextButton.style.display = 'block';
-    }
-}
-
-function hideNextButton() {
-    const nextButton = document.querySelector('.next-button');
-    if (nextButton) {
-        nextButton.style.display = 'none';
-    }
 }
 
 function showLoading() {
