@@ -218,6 +218,38 @@ function displayTopTracks(tracks) {
     initializePlayButtons();
     initializeSpotifyButtons();
     initializeFavoriteButtons();
+    
+    // QUICK FIX: Add track items animation directly here
+    animateTrackItems();
+}
+
+// NEW FUNCTION: Animate track items after they're loaded
+function animateTrackItems() {
+    // Wait a brief moment for the DOM to update completely
+    setTimeout(() => {
+        const trackItems = document.querySelectorAll('.track-item');
+        
+        if (trackItems.length > 0) {
+            console.log(`Animating ${trackItems.length} track items`);
+            
+            // GSAP animation for track items
+            gsap.fromTo(trackItems, 
+                { 
+                    y: 30, 
+                    opacity: 0,
+                    scale: 0.9
+                },
+                {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.6,
+                    stagger: 0.1,
+                    ease: 'power2.out'
+                }
+            );
+        }
+    }, 50);
 }
 
 // Audio player for previews

@@ -188,4 +188,60 @@
         width: 50px;
         height: 50px;
     }
+    /* Add to about.css */
+
+/* Enhanced feature cards for 3D effects */
+.feature-card {
+    background-color: var(--surface);
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Mission section enhancements */
+.mission-section {
+    margin: 60px 0;
+    padding: 40px;
+    background-color: var(--surface);
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+/* Steps list enhancements */
+.steps-list li {
+    transition: background-color 0.3s ease;
+    padding: 20px 20px 20px 80px;
+    border-radius: 8px;
+}
+
+/* Custom property for number color */
+.steps-list li::before {
+    transition: background-color 0.3s ease;
+    background-color: var(--primary-shade, var(--primary));
+}
+
+/* Enhanced visualization */
+.about-visualization {
+    margin: 20px 0 40px 0;
+    padding: 20px;
+    background: var(--surface);
+    border-radius: 12px;
+    text-align: center;
+    transform-style: preserve-3d;
+}
+
+/* Mobile responsive updates */
+@media (max-width: 768px) {
+    .steps-list li {
+        padding-left: 60px;
+    }
+    
+    /* Reduce animation intensity on mobile */
+    .feature-card {
+        transform: none !important;
+    }
+}
 }

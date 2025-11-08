@@ -2,6 +2,7 @@
 class VibeCheckAnimations {
     // Home page animations
     static initHomePageAnimations() {
+        // Your existing home page animations remain exactly the same
         // Hero text fade in
         gsap.fromTo('.hero h1', 
             { opacity: 0, y: 50 },
@@ -120,6 +121,7 @@ class VibeCheckAnimations {
 
     // Favorites page animations
     static initFavoritesAnimations() {
+        // Your existing favorites animations remain exactly the same
         // GSAP 1: Timeline animation - Sequential loading animation
         const favoritesTimeline = gsap.timeline();
         favoritesTimeline.fromTo('.page-title',
@@ -222,6 +224,7 @@ class VibeCheckAnimations {
 
     // Artist page animations
     static initArtistAnimations() {
+        // Your existing artist animations remain exactly the same
         // GSAP 1: Timeline animation - Content slides in from right
         const artistTimeline = gsap.timeline();
         artistTimeline.fromTo('.artist-header',
@@ -276,9 +279,11 @@ class VibeCheckAnimations {
         });
     }
 
-    // About page animations
+    // About page animations - SIMPLIFIED VERSION
     static initAboutAnimations() {
-        // GSAP 1: Timeline animation - Sequential content loading
+        console.log('🎭 Initializing About Page Animations');
+        
+        // Keep your existing about animations
         const aboutTimeline = gsap.timeline();
         aboutTimeline.fromTo('.page-title',
             { y: -50, opacity: 0 },
@@ -408,6 +413,69 @@ class VibeCheckAnimations {
                     ease: 'power2.out'
                 });
             }
+        });
+
+        // ADD SIMPLE TEXT ANIMATIONS (NEW)
+        this.addSimpleTextAnimations();
+    }
+
+    // NEW: Simple text animations that don't interfere with existing ones
+    static addSimpleTextAnimations() {
+        // Simple fade-in for mission text
+        gsap.fromTo('.mission-section p',
+            { opacity: 0, y: 20 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.3,
+                scrollTrigger: {
+                    trigger: '.mission-section',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+
+        // Simple bounce for feature card titles
+        gsap.fromTo('.feature-card h3',
+            { scale: 0.8, opacity: 0 },
+            {
+                scale: 1,
+                opacity: 1,
+                duration: 0.6,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: '.feature-grid',
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+
+        // Simple slide-in for step descriptions
+        gsap.fromTo('.steps-list p',
+            { x: -30, opacity: 0 },
+            {
+                x: 0,
+                opacity: 1,
+                duration: 0.6,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: '.steps-list',
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                }
+            }
+        );
+
+        // Add a subtle glow effect to the main title
+        gsap.to('.page-title', {
+            textShadow: '0 0 20px var(--primary)',
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
         });
     }
 
