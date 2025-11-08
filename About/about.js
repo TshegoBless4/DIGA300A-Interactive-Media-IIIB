@@ -1,4 +1,4 @@
-// About page specific JavaScript
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeAboutPage();
 });
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeAboutPage() {
     console.log('About page initialized');
 
-    // Initialize animations - check if VibeCheckAnimations exists
+    // Initialize animations 
     if (typeof VibeCheckAnimations !== 'undefined') {
         VibeCheckAnimations.initAboutAnimations();
     } else {

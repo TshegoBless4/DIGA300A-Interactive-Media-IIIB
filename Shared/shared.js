@@ -33,7 +33,7 @@ function getCurrentPage() {
         return 'home';
     }
     
-    // Additional fallback: check if we're in the root directory
+    // Additional fallback: check if we're in the root 
     if (path === '/' || path.endsWith('/VibeCheck/') || !filename) {
         return 'home';
     }

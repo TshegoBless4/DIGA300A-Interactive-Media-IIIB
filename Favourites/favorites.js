@@ -1,4 +1,4 @@
-// Favorites page specific JavaScript
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Favorites page loaded');
     initializeFavoritesPage();
@@ -231,7 +231,7 @@ function playDemoAudio(button, trackIndex) {
         button.textContent = '⏸';
         button.classList.add('playing');
         
-        // Stop after 1.5 seconds (demo preview)
+        // Stop after 1.5 seconds (demo preview). This demo preview is troubling me. testing 
         setTimeout(() => {
             if (currentAudio && currentAudio.oscillator) {
                 currentAudio.oscillator.stop();
@@ -245,7 +245,7 @@ function playDemoAudio(button, trackIndex) {
     } catch (error) {
         console.error('Audio error:', error);
         // Fallback: just show visual feedback
-        button.textContent = '🔊';
+        button.textContent = 'speaker';
         button.classList.add('playing');
         setTimeout(() => {
             button.textContent = '▶';

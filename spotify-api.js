@@ -1,9 +1,9 @@
-// Spotify API configuration and functions
+
 class SpotifyAPI {
     constructor() {
         
-        this.clientId = 'd5d3636adc6746a69aece5765bd9a775'; // PASTE YOUR CLIENT ID
-        this.clientSecret = '927608615fc64266a18c0288f00c97ca'; // 
+        this.clientId = 'd5d3636adc6746a69aece5765bd9a775'; 
+        this.clientSecret = '927608615fc64266a18c0288f00c97ca'; 
         this.accessToken = null;
         this.baseURL = 'https://api.spotify.com/v1';
         console.log('SpotifyAPI initialized with Client ID:', this.clientId ? 'SET' : 'MISSING');
@@ -166,7 +166,7 @@ class SpotifyAPI {
             throw error;
         }
     }
-    // Add these methods to your SpotifyAPI class:
+    
 
 async getArtistAlbums(artistId, limit = 20) {
     try {

@@ -1,8 +1,8 @@
-// GSAP Animations for VibeCheck
+
 class VibeCheckAnimations {
     // Home page animations
     static initHomePageAnimations() {
-        // Your existing home page animations remain exactly the same
+        
         // Hero text fade in
         gsap.fromTo('.hero h1', 
             { opacity: 0, y: 50 },
@@ -44,7 +44,7 @@ class VibeCheckAnimations {
         const soundDot = document.querySelector('.sound-dot');
         
         if (waveLine && soundDot) {
-            // Animate the wave path
+            // Animating the wave path
             gsap.to(waveLine, {
                 attr: { 
                     d: "M0,40 Q50,60 100,40 T200,40 T300,40",
@@ -94,9 +94,9 @@ class VibeCheckAnimations {
             }
         );
 
-        // FIXED: Only the main title moves up slightly on scroll
+        
         gsap.to('.hero h1', {
-            y: -40, // Only affects the h1, not the paragraph
+            y: -40, //making sure it inly affects h1 instead of the whole paragraph
             duration: 0.5,
             scrollTrigger: {
                 trigger: '.hero',
@@ -106,7 +106,7 @@ class VibeCheckAnimations {
             }
         });
 
-        // Paragraph stays in place but can have a subtle effect if wanted
+        
         gsap.to('.hero p', {
             y: -10, // Very subtle movement for the paragraph
             duration: 0.5,
@@ -121,7 +121,7 @@ class VibeCheckAnimations {
 
     // Favorites page animations
     static initFavoritesAnimations() {
-        // Your existing favorites animations remain exactly the same
+        
         // GSAP 1: Timeline animation - Sequential loading animation
         const favoritesTimeline = gsap.timeline();
         favoritesTimeline.fromTo('.page-title',
@@ -139,8 +139,8 @@ class VibeCheckAnimations {
 
         // GSAP 2: ScrollTrigger animation - Title moves up but returns when scrolling back
         gsap.to('.page-title', {
-            y: -30, // Noticeable movement
-            scale: 0.95, // Also scales slightly
+            y: -30, 
+            scale: 0.95, 
             duration: 0.5,
             scrollTrigger: {
                 trigger: '.favorites-visualization',
@@ -152,7 +152,7 @@ class VibeCheckAnimations {
             }
         });
 
-        // GSAP 3: ScrollTrigger animation - Track items fade in on scroll
+        // GSAP 3: ScrollTrigger animation 
         gsap.fromTo('.track-item',
             { y: 30, opacity: 0 },
             {
@@ -169,7 +169,7 @@ class VibeCheckAnimations {
             }
         );
 
-        // GSAP 4: SVG/MotionPath animation - Heart wave with floating heart
+        // GSAP 4: SVG/MotionPath animation.Heart wave with floating heart
         const heartPath = document.querySelector('.heart-path');
         const floatingHeart = document.querySelector('.floating-heart');
         
@@ -224,7 +224,7 @@ class VibeCheckAnimations {
 
     // Artist page animations
     static initArtistAnimations() {
-        // Your existing artist animations remain exactly the same
+        
         // GSAP 1: Timeline animation - Content slides in from right
         const artistTimeline = gsap.timeline();
         artistTimeline.fromTo('.artist-header',
@@ -240,13 +240,13 @@ class VibeCheckAnimations {
             '-=0.3'
         );
 
-        // SUBTLE: Artist header moves up slightly on scroll
+        // SUBTLE stuff
         gsap.to('.artist-header', {
             y: -10, // Reduced from -20 to -10 (very subtle)
-            duration: 0.5, // Slower duration for smoother effect
+            duration: 0.5, 
             scrollTrigger: {
                 trigger: '.tracks-section',
-                start: 'top 40%', // Start much later (40% down the viewport)
+                start: 'top 40%', 
                 end: 'bottom top',
                 scrub: true,
                 markers: false
@@ -281,7 +281,7 @@ class VibeCheckAnimations {
 
     // About page animations - SIMPLIFIED VERSION
     static initAboutAnimations() {
-        console.log('🎭 Initializing About Page Animations');
+        console.log(' Initializing About Page Animations');
         
         // Keep your existing about animations
         const aboutTimeline = gsap.timeline();
@@ -415,11 +415,11 @@ class VibeCheckAnimations {
             }
         });
 
-        // ADD SIMPLE TEXT ANIMATIONS (NEW)
+        
         this.addSimpleTextAnimations();
     }
 
-    // NEW: Simple text animations that don't interfere with existing ones
+    
     static addSimpleTextAnimations() {
         // Simple fade-in for mission text
         gsap.fromTo('.mission-section p',

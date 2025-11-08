@@ -1,4 +1,4 @@
-// Artist page specific JavaScript
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Artist page loaded');
     initializeArtistPage();
@@ -30,7 +30,7 @@ async function initializeArtistPage() {
     }
 }
 
-// UPDATED: Simplified back button with just <
+// Simplified back button with just <. Ths was much better actually
 function setupArtistBackButton() {
     // Create back button if it doesn't exist
     let backButton = document.getElementById('back-button');
@@ -39,7 +39,7 @@ function setupArtistBackButton() {
         backButton = document.createElement('button');
         backButton.id = 'back-button';
         backButton.className = 'btn btn-secondary back-button';
-        backButton.innerHTML = '&lt;'; // Just the < symbol
+        backButton.innerHTML = '&lt;'; //  < symbol is right here. adding this so i can identify it
         backButton.title = 'Back to Previous Page';
         backButton.style.cssText = `
             margin-bottom: 20px; 
@@ -49,7 +49,7 @@ function setupArtistBackButton() {
             font-weight: bold;
         `;
         
-        // Insert at the top of the container
+        
         const container = document.querySelector('.container');
         const firstChild = container.firstChild;
         container.insertBefore(backButton, firstChild);
