@@ -7,20 +7,19 @@ let currentGenre = null;
 let currentOffset = 0;
 const ARTISTS_PER_PAGE = 6;
 
-// NEW: Navigation history management
+// Navigation history management
 let navigationHistory = [];
 let currentPageState = null;
-let genreHistory = []; // NEW: Track genre navigation history
+let genreHistory = [];
 
 async function initializeHomePage() {
     setupSearch();
     setupGenres();
     setupAnimations();
-    setupNavigationButtons(); // UPDATED: Now sets up both next and previous
+    setupNavigationButtons();
     setupBackButton();
     setupBrowserBackButton();
     
-    // Check if we should restore state or load popular artists
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('fromBack') && navigationHistory.length > 0) {
         const previousState = navigationHistory.pop();
@@ -30,7 +29,6 @@ async function initializeHomePage() {
     }
 }
 
-// NEW: Navigation history functions
 function saveCurrentState() {
     const state = {
         genre: currentGenre,
@@ -46,7 +44,6 @@ function getCurrentDisplayedArtists() {
     const artistCards = document.querySelectorAll('.artist-card');
     const artists = [];
     
-    // Use forEach to maintain the exact order from the DOM
     artistCards.forEach(card => {
         const name = card.querySelector('.artist-name')?.textContent;
         const genre = card.querySelector('.artist-genre')?.textContent;
@@ -62,16 +59,13 @@ function getCurrentDisplayedArtists() {
 }
 
 function pushToHistory(state) {
-    navigationHistory.push(JSON.parse(JSON.stringify(state))); // Deep clone
-    // Keep only last 10 history items to prevent memory issues
+    navigationHistory.push(JSON.parse(JSON.stringify(state)));
     if (navigationHistory.length > 10) {
         navigationHistory.shift();
     }
-    console.log('History updated:', navigationHistory.length, 'items');
 }
 
 function setupBackButton() {
-    // Check if we're coming from a back navigation
     const urlParams = new URLSearchParams(window.location.search);
     const fromBack = urlParams.get('fromBack');
     
@@ -87,18 +81,15 @@ function restoreState(state) {
     currentGenre = state.genre;
     currentOffset = state.offset;
     
-    // Restore search input if it exists
     const searchInput = document.querySelector('.search-input');
     if (searchInput && state.searchTerm) {
         searchInput.value = state.searchTerm;
     }
     
-    // Re-display artists
     if (state.artists && state.artists.length > 0) {
         displayArtistResultsFromState(state.artists, state.genre);
     }
     
-    // Update genre pill active state
     if (state.genre) {
         setActiveGenrePill(state.genre);
         showNextButton();
@@ -119,7 +110,6 @@ function displayArtistResultsFromState(artists, genre) {
         resultsContainer.appendChild(genreTitle);
     }
 
-    // Display artists in the exact order they were saved
     artists.forEach(artist => {
         const artistCard = document.createElement('div');
         artistCard.className = 'artist-card card';
@@ -150,25 +140,21 @@ function setupBrowserBackButton() {
             const previousState = navigationHistory.pop();
             restoreState(previousState);
         } else {
-            // If no history, go to popular artists
             loadPopularArtists();
         }
     });
 }
 
-// UPDATED: Setup both next and previous buttons
 function setupNavigationButtons() {
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'navigation-buttons-container';
     
-    // Previous button
     const previousButton = document.createElement('button');
     previousButton.className = 'btn btn-secondary previous-button';
     previousButton.innerHTML = '← Previous';
     previousButton.style.display = 'none';
     previousButton.addEventListener('click', loadPreviousGenreArtists);
     
-    // Next button
     const nextButton = document.createElement('button');
     nextButton.className = 'btn btn-primary next-button';
     nextButton.textContent = 'Next →';
@@ -182,20 +168,15 @@ function setupNavigationButtons() {
     resultsContainer.parentNode.insertBefore(buttonContainer, resultsContainer.nextSibling);
 }
 
-// NEW: Previous button functionality for genre navigation
 async function loadPreviousGenreArtists() {
     if (genreHistory.length <= 1) {
-        // If no previous state, reload the initial genre search
         if (currentGenre) {
             await handleGenreSelection(currentGenre);
         }
         return;
     }
     
-    // Remove current state
     genreHistory.pop();
-    
-    // Get previous state
     const previousState = genreHistory[genreHistory.length - 1];
     
     if (previousState) {
@@ -208,22 +189,20 @@ async function loadPreviousGenreArtists() {
         setActiveGenrePill(currentGenre);
         
         try {
-            // Use the search terms from previous state
             const searchQuery = previousState.searchQuery || `genre:${currentGenre}`;
             const data = await spotifyAPI.searchArtists(searchQuery);
             
             if (data.artists?.items && data.artists.items.length > 0) {
                 displayArtistResults(data.artists.items, currentGenre);
             } else {
-                // Fallback to demo data
-                showDemoGenreResults(currentGenre);
+                showError(`No ${currentGenre} artists found. Try another genre.`);
             }
             
             updateNavigationButtons();
             
         } catch (error) {
             console.error('Previous genre artists error:', error);
-            showDemoGenreResults(currentGenre);
+            showError('Error loading artists. Please try again.');
             updateNavigationButtons();
         } finally {
             hideLoading();
@@ -231,14 +210,12 @@ async function loadPreviousGenreArtists() {
     }
 }
 
-// UPDATED: Save state when loading next artists
 async function loadNextGenreArtists() {
     if (!currentGenre) return;
     
     showLoading();
     hideError();
     
-    // Save current state to genre history before loading next
     const currentState = {
         genre: currentGenre,
         offset: currentOffset,
@@ -248,7 +225,6 @@ async function loadNextGenreArtists() {
     genreHistory.push(currentState);
     
     try {
-        // Use offset to get different results
         const randomTerms = getRandomSearchTerms(currentGenre);
         const randomTerm = randomTerms[Math.floor(Math.random() * randomTerms.length)];
         
@@ -258,12 +234,10 @@ async function loadNextGenreArtists() {
         if (data.artists?.items && data.artists.items.length > 0) {
             displayArtistResults(data.artists.items, currentGenre);
             
-            // Update current state with new search query
             if (genreHistory.length > 0) {
                 genreHistory[genreHistory.length - 1].searchQuery = searchQuery;
             }
         } else {
-            // Fallback to regular genre search
             const genreData = await spotifyAPI.searchByGenre(currentGenre);
             const artistIds = extractArtistIdsFromTracks(genreData.tracks.items);
             if (artistIds.length > 0) {
@@ -277,14 +251,13 @@ async function loadNextGenreArtists() {
         
     } catch (error) {
         console.error('Next genre artists error:', error);
-        showDemoGenreResults(currentGenre);
+        showError('Error loading more artists. Please try again.');
         updateNavigationButtons();
     } finally {
         hideLoading();
     }
 }
 
-// NEW: Update navigation buttons visibility
 function updateNavigationButtons() {
     const previousButton = document.querySelector('.previous-button');
     const nextButton = document.querySelector('.next-button');
@@ -298,7 +271,6 @@ function updateNavigationButtons() {
     }
 }
 
-// UPDATED: Hide both navigation buttons
 function hideNavigationButtons() {
     const previousButton = document.querySelector('.previous-button');
     const nextButton = document.querySelector('.next-button');
@@ -306,11 +278,9 @@ function hideNavigationButtons() {
     if (previousButton) previousButton.style.display = 'none';
     if (nextButton) nextButton.style.display = 'none';
     
-    // Reset genre history
     genreHistory = [];
 }
 
-// UPDATED: Show next button only (for backward compatibility)
 function showNextButton() {
     const nextButton = document.querySelector('.next-button');
     if (nextButton) {
@@ -319,7 +289,6 @@ function showNextButton() {
     updateNavigationButtons();
 }
 
-// UPDATED: Hide next button only (for backward compatibility)
 function hideNextButton() {
     const nextButton = document.querySelector('.next-button');
     if (nextButton) {
@@ -333,27 +302,15 @@ async function loadPopularArtists() {
         const popularArtistIds = await getRandomPopularArtists();
         const data = await spotifyAPI.getSeveralArtists(popularArtistIds);
         displayArtistResults(data.artists, 'Popular');
-        hideNavigationButtons(); // UPDATED: Hide both buttons
+        hideNavigationButtons();
         resetGenrePills();
         
-        // Save initial state
         saveCurrentState();
     } catch (error) {
-        console.log('Using demo popular artists');
-        const demoArtists = [
-            { id: '1', name: 'Kendrick Lamar', images: [{url: 'https://via.placeholder.com/200'}], genres: ['Hip-Hop'] },
-            { id: '2', name: 'Taylor Swift', images: [{url: 'https://via.placeholder.com/200'}], genres: ['Pop'] },
-            { id: '3', name: 'Daft Punk', images: [{url: 'https://via.placeholder.com/200'}], genres: ['Electronic'] },
-            { id: '4', name: 'Frank Ocean', images: [{url: 'https://via.placeholder.com/200'}], genres: ['R&B'] },
-            { id: '5', name: 'The Weeknd', images: [{url: 'https://via.placeholder.com/200'}], genres: ['Pop'] },
-            { id: '6', name: 'Beyoncé', images: [{url: 'https://via.placeholder.com/200'}], genres: ['R&B'] }
-        ];
-        displayArtistResults(demoArtists, 'Popular Artists');
-        hideNavigationButtons(); // UPDATED: Hide both buttons
+        console.log('Error loading popular artists:', error);
+        showError('Error loading popular artists. Please try again.');
+        hideNavigationButtons();
         resetGenrePills();
-        
-        // Save initial state
-        saveCurrentState();
     }
 }
 
@@ -421,22 +378,17 @@ function setupAnimations() {
     }
 }
 
-// UPDATED: Handle genre selection to reset history and show buttons
 async function handleGenreSelection(genre) {
     showLoading();
     hideError();
     
-    // Save current state before changing
     saveCurrentState();
     pushToHistory(currentPageState);
     
-    // Reset genre history for new genre
     genreHistory = [];
-    
     currentGenre = genre;
     currentOffset = 0;
     
-    // Set active state on genre pill
     setActiveGenrePill(genre);
     
     try {
@@ -447,7 +399,6 @@ async function handleGenreSelection(genre) {
             if (artistIds.length > 0) {
                 await displayArtistsFromIds(artistIds, genre);
                 
-                // Save initial genre state
                 genreHistory.push({
                     genre: genre,
                     offset: 0,
@@ -466,23 +417,12 @@ async function handleGenreSelection(genre) {
     } catch (error) {
         console.error('Genre search error:', error);
         showError(`No ${genre} music found. Please try another genre.`);
-        showDemoGenreResults(genre);
-        
-        // Save demo state to history
-        genreHistory.push({
-            genre: genre,
-            offset: 0,
-            searchQuery: `genre:${genre}`,
-            artists: getCurrentDisplayedArtists()
-        });
-        
         updateNavigationButtons();
     } finally {
         hideLoading();
     }
 }
 
-// Function to set active state on genre pill
 function setActiveGenrePill(genre) {
     const genrePills = document.querySelectorAll('.genre-pill');
     
@@ -495,7 +435,6 @@ function setActiveGenrePill(genre) {
     });
 }
 
-// Function to reset all genre pills (remove active state)
 function resetGenrePills() {
     const genrePills = document.querySelectorAll('.genre-pill');
     genrePills.forEach(pill => {
@@ -510,7 +449,17 @@ function getRandomSearchTerms(genre) {
         'Jazz': ['bebop', 'fusion', 'smooth', 'contemporary', 'traditional'],
         'Hip-hop': ['rap', 'trap', 'boom bap', 'conscious', 'underground'],
         'Pop': ['indie', 'electropop', 'synthpop', 'dance', 'mainstream'],
-        'Rock': ['alternative', 'indie', 'classic', 'hard', 'progressive']
+        'Rock': ['alternative', 'indie', 'classic', 'hard', 'progressive'],
+        'Electronic': ['house', 'techno', 'dubstep', 'ambient', 'dance'],
+        'Country': ['americana', 'folk', 'bluegrass', 'outlaw', 'modern'],
+        'Classical': ['baroque', 'romantic', 'contemporary', 'orchestral', 'piano'],
+        'Reggae': ['dancehall', 'roots', 'dub', 'ska', 'modern'],
+        'Metal': ['heavy', 'thrash', 'death', 'black', 'progressive'],
+        'Indie': ['alternative', 'rock', 'pop', 'folk', 'electronic'],
+        'Folk': ['americana', 'traditional', 'contemporary', 'acoustic', 'singer-songwriter'],
+        'Blues': ['delta', 'chicago', 'electric', 'acoustic', 'modern'],
+        'Soul': ['motown', 'philly', 'northern', 'deep', 'modern'],
+        'Funk': ['p-funk', 'disco', 'afrobeat', 'modern', 'acid jazz']
     };
     
     return searchTerms[genre] || ['new', 'popular', 'latest', 'rising'];
@@ -545,7 +494,6 @@ async function displayArtistsFromIds(artistIds, genre) {
     }
 }
 
-// FIXED: Removed the shuffle that was causing randomization
 function displayArtistResults(artists, genre = null) {
     const resultsContainer = document.getElementById('search-results');
     
@@ -563,7 +511,6 @@ function displayArtistResults(artists, genre = null) {
         resultsContainer.appendChild(genreTitle);
     }
 
-    // FIXED: Removed the shuffle - artists now display in API order consistently
     const artistsToDisplay = artists;
     
     artistsToDisplay.forEach(artist => {
@@ -609,7 +556,6 @@ function navigateToArtist(artistId, artistName) {
     window.location.href = artistPageUrl;
 }
 
-// UPDATED: Handle search to hide navigation buttons
 async function handleSearch() {
     const query = document.querySelector('.search-input').value.trim();
     if (!query) {
@@ -617,20 +563,18 @@ async function handleSearch() {
         return;
     }
 
-    // Save current state before searching
     saveCurrentState();
     pushToHistory(currentPageState);
 
     showLoading();
     hideError();
-    hideNavigationButtons(); // UPDATED: Hide both buttons
+    hideNavigationButtons();
     resetGenrePills();
 
     try {
         const data = await spotifyAPI.searchArtists(query);
         displayArtistResults(data.artists.items);
         
-        // Save search state
         saveCurrentState();
     } catch (error) {
         console.error('Search error:', error);
@@ -638,87 +582,6 @@ async function handleSearch() {
     } finally {
         hideLoading();
     }
-}
-
-function showDemoGenreResults(genre) {
-    const resultsContainer = document.getElementById('search-results');
-    const demoArtists = getDemoArtistsByGenre(genre);
-    
-    let html = `<h3 class="section-title">${genre} Artists</h3>`;
-    
-    demoArtists.forEach(artist => {
-        html += `
-            <div class="artist-card card" data-artist-id="${artist.id}">
-                <img src="${artist.image}" alt="${artist.name}" class="artist-image">
-                <div class="artist-name">${artist.name}</div>
-                <div class="artist-genre">${genre}</div>
-            </div>
-        `;
-    });
-    
-    resultsContainer.innerHTML = html;
-    
-    document.querySelectorAll('.artist-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const artistName = this.querySelector('.artist-name').textContent;
-            const artistId = this.getAttribute('data-artist-id');
-            navigateToArtist(artistId, artistName);
-        });
-    });
-}
-
-function getDemoArtistsByGenre(genre) {
-    const demoArtists = {
-        'R&B': [
-            { id: '2h93pZq0e7k5yf4dywlkpM', name: 'Frank Ocean', image: 'https://via.placeholder.com/200' },
-            { id: '7tDP9SpanWMLwU6Dhrc20R', name: 'SZA', image: 'https://via.placeholder.com/200' },
-            { id: '20qyvvg5r7rR5TZPwbi9N0', name: 'Daniel Caesar', image: 'https://via.placeholder.com/200' },
-            { id: '5K4W6rqBFWDnAN6FQUkS6x', name: 'Kanye West', image: 'https://via.placeholder.com/200' },
-            { id: '1Xyo4u8uXC1ZmMpatF05PJ', name: 'The Weeknd', image: 'https://via.placeholder.com/200' },
-            { id: '6M2wZ9GZgrQXHCFfjv46we', name: 'Dua Lipa', image: 'https://via.placeholder.com/200' }
-        ],
-        'Jazz': [
-            { id: '0kbYTNQb4Pb1rPbbaF0pT4', name: 'Miles Davis', image: 'https://via.placeholder.com/200' },
-            { id: '2d1Dl0nqz8TzMAc1pXV5ww', name: 'John Coltrane', image: 'https://via.placeholder.com/200' },
-            { id: '5rM4q5mrOaD5x1d5q8xmyw', name: 'Ella Fitzgerald', image: 'https://via.placeholder.com/200' },
-            { id: '4Z8W4fKeB5YxbusRsdQVPb', name: 'Radiohead', image: 'https://via.placeholder.com/200' },
-            { id: '4pejUc4iciQfgdX6OKulQn', name: 'Queens of the Stone Age', image: 'https://via.placeholder.com/200' },
-            { id: '3WrFJ7ztbogyGnTHbHJFl2', name: 'The Beatles', image: 'https://via.placeholder.com/200' }
-        ],
-        'Hip-hop': [
-            { id: '2YZyLoL8N0Wb9xBt1NhZWg', name: 'Kendrick Lamar', image: 'https://via.placeholder.com/200' },
-            { id: '3TVXtAsR1Inumwj472S9r4', name: 'Drake', image: 'https://via.placeholder.com/200' },
-            { id: '6O4EGCCb6DoIiR6B1QCQgp', name: 'J. Cole', image: 'https://via.placeholder.com/200' },
-            { id: '7dGJo4pcD2V6oG8kP0tJRR', name: 'Eminem', image: 'https://via.placeholder.com/200' },
-            { id: '4q3ewBCX7sLwd24euuV69X', name: 'Bad Bunny', image: 'https://via.placeholder.com/200' },
-            { id: '1RyvyyTE3xzB2ZywiAwp0i', name: 'Future', image: 'https://via.placeholder.com/200' }
-        ],
-        'Pop': [
-            { id: '06HL4z0CvFAxyc27GXpf02', name: 'Taylor Swift', image: 'https://via.placeholder.com/200' },
-            { id: '66CXWjxzNUsdJxJ2JdwvnR', name: 'Ariana Grande', image: 'https://via.placeholder.com/200' },
-            { id: '6eUKZXaKkcviH0Ku9w2n3V', name: 'Ed Sheeran', image: 'https://via.placeholder.com/200' },
-            { id: '1uNFoZAHBGtllmzznpCI3s', name: 'Justin Bieber', image: 'https://via.placeholder.com/200' },
-            { id: '4q3ewBCX7sLwd24euuV69X', name: 'Bad Bunny', image: 'https://via.placeholder.com/200' },
-            { id: '6jJ0s89eD6GaHleKKya26X', name: 'Katy Perry', image: 'https://via.placeholder.com/200' }
-        ],
-        'Rock': [
-            { id: '3WrFJ7ztbogyGnTHbHJFl2', name: 'The Beatles', image: 'https://via.placeholder.com/200' },
-            { id: '1dfeR4HaWDbWqFHLkxsg1d', name: 'Queen', image: 'https://via.placeholder.com/200' },
-            { id: '36QJpDe2go2KgaRleHCDTp', name: 'Led Zeppelin', image: 'https://via.placeholder.com/200' },
-            { id: '4pejUc4iciQfgdX6OKulQn', name: 'Queens of the Stone Age', image: 'https://via.placeholder.com/200' },
-            { id: '4Z8W4fKeB5YxbusRsdQVPb', name: 'Radiohead', image: 'https://via.placeholder.com/200' },
-            { id: '2ye2Wgw4gimLv2eAKyk1NB', name: 'Metallica', image: 'https://via.placeholder.com/200' }
-        ]
-    };
-    
-    return demoArtists[genre] || [
-        { id: 'demo-1', name: `${genre} Artist 1`, image: 'https://via.placeholder.com/200' },
-        { id: 'demo-2', name: `${genre} Artist 2`, image: 'https://via.placeholder.com/200' },
-        { id: 'demo-3', name: `${genre} Artist 3`, image: 'https://via.placeholder.com/200' },
-        { id: 'demo-4', name: `${genre} Artist 4`, image: 'https://via.placeholder.com/200' },
-        { id: 'demo-5', name: `${genre} Artist 5`, image: 'https://via.placeholder.com/200' },
-        { id: 'demo-6', name: `${genre} Artist 6`, image: 'https://via.placeholder.com/200' }
-    ];
 }
 
 function showLoading() {

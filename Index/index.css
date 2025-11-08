@@ -54,6 +54,8 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .genre-pill {
@@ -63,12 +65,15 @@
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
-    user-select: none; /* Prevent text selection */
-    -webkit-user-select: none; /* For Safari */
-    -moz-user-select: none; /* For Firefox */
-    -ms-user-select: none; /* For IE/Edge */
-    outline: none; /* Remove focus outline */
-    border: 2px solid transparent; /* Prepare for active state */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    outline: none;
+    border: 2px solid transparent;
+    flex: 0 0 auto;
+    text-align: center;
+    min-width: 80px;
 }
 
 .genre-pill:hover {
@@ -128,30 +133,28 @@
     margin-top: 4px;
 }
 
-/* Next button styles */
-.next-button-container {
+/* Navigation buttons styles */
+.navigation-buttons-container {
     text-align: center;
     margin: 40px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
-.next-button {
+.previous-button, .next-button {
     padding: 12px 24px;
     font-size: 16px;
     font-weight: 600;
     border-radius: 8px;
     transition: all 0.3s ease;
+    min-width: 120px;
 }
 
-.next-button:hover {
+.previous-button:hover, .next-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(108, 11, 169, 0.3);
-}
-
-/* Loading state for next button */
-.next-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
 }
 
 /* Section title for random artists */
@@ -213,52 +216,7 @@
     .artist-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
-    /* Navigation buttons styles */
-.navigation-buttons-container {
-    text-align: center;
-    margin: 40px 0;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.previous-button, .next-button {
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    min-width: 120px;
-}
-
-.previous-button:hover, .next-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 11, 169, 0.3);
-}
-
-/* Back button specific style */
-.back-button {
-    background-color: var(--surface);
-    color: var(--text-primary);
-    border: 1px solid var(--text-secondary);
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 18px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.back-button:hover {
-    background-color: var(--text-secondary);
-    color: var(--background);
-    transform: translateY(-2px);
-}
-
-/* Mobile responsive for navigation buttons */
-@media (max-width: 768px) {
+    
     .navigation-buttons-container {
         flex-direction: column;
         align-items: center;
@@ -268,9 +226,14 @@
         width: 200px;
     }
     
-    .back-button {
-        padding: 8px 12px;
-        font-size: 16px;
+    .genre-container {
+        gap: 8px;
+        max-width: 100%;
     }
-}
+    
+    .genre-pill {
+        padding: 6px 12px;
+        font-size: 14px;
+        min-width: 70px;
+    }
 }
