@@ -1,4 +1,4 @@
-// Home page specific JavaScript with Spotify API
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeHomePage();
 });

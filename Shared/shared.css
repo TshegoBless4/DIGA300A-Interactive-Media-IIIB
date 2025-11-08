@@ -175,7 +175,7 @@ nav {
     text-align: center;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .nav-links {
         gap: 10px;
@@ -189,7 +189,7 @@ nav {
         font-size: 28px;
     }
 
-    /* Back button styles */
+    
 .btn-secondary {
     background-color: var(--surface);
     color: var(--text-primary);

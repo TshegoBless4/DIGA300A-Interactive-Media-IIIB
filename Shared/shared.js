@@ -1,4 +1,4 @@
-// Common functionality shared across all pages
+// Common functionality shared across all pages. 
 
 // Enhanced navigation initialization
 function initializeNavigation() {
@@ -33,7 +33,7 @@ function getCurrentPage() {
         return 'home';
     }
     
-    // Additional fallback: check if we're in the root 
+    // Additional fallback: check if i am in the root 
     if (path === '/' || path.endsWith('/VibeCheck/') || !filename) {
         return 'home';
     }

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeAboutPage() {
     console.log('About page initialized');
 
-    // Initialize animations 
+    
     if (typeof VibeCheckAnimations !== 'undefined') {
         VibeCheckAnimations.initAboutAnimations();
     } else {

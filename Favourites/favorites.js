@@ -144,7 +144,7 @@ function removeFavorite(trackKey, trackItem) {
                 localStorage.removeItem(trackKey);
                 // Remove from DOM
                 trackItem.remove();
-                // Check if list is now empty
+                
                 checkEmptyState();
             }
         });
@@ -186,7 +186,7 @@ function initializeSpotifyButtons() {
 }
 
 function playDemoAudio(button, trackIndex) {
-    // If this button is already playing, stop it
+    // If this button is already playing, stop it. T(this still doesn't work because of Spotify)
     if (currentlyPlaying === button && currentAudio) {
         currentAudio.pause();
         button.textContent = '▶';
@@ -221,7 +221,7 @@ function playDemoAudio(button, trackIndex) {
         
         oscillator.frequency.value = frequency;
         oscillator.type = 'sine';
-        gainNode.gain.value = 0.1; // Low volume
+        gainNode.gain.value = 0.1; 
         
         // Start playing
         oscillator.start();
@@ -244,7 +244,7 @@ function playDemoAudio(button, trackIndex) {
         
     } catch (error) {
         console.error('Audio error:', error);
-        // Fallback: just show visual feedback
+        // Fallback
         button.textContent = 'speaker';
         button.classList.add('playing');
         setTimeout(() => {

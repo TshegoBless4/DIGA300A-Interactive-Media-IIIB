@@ -1,4 +1,4 @@
-/* Home page specific styles */
+
 .hero {
     text-align: center;
     padding: 60px 0;
@@ -94,7 +94,7 @@
     transform: translateY(-2px);
 }
 
-/* Remove any focus states that might cause blinking cursor */
+/* for blinking blinking cursor */
 .genre-pill:focus,
 .genre-pill:focus-visible {
     outline: none;
@@ -133,7 +133,7 @@
     margin-top: 4px;
 }
 
-/* Navigation buttons styles */
+
 .navigation-buttons-container {
     text-align: center;
     margin: 40px 0;
@@ -157,7 +157,7 @@
     box-shadow: 0 4px 12px rgba(108, 11, 169, 0.3);
 }
 
-/* Section title for random artists */
+
 .section-title {
     text-align: center;
     margin-bottom: 30px;
@@ -166,7 +166,7 @@
     color: var(--text-primary);
 }
 
-/* No results message */
+
 .no-results {
     text-align: center;
     color: var(--text-secondary);

@@ -30,7 +30,7 @@ async function initializeArtistPage() {
     }
 }
 
-// Simplified back button with just <. Ths was much better actually
+// back button with just <. Ths was much better actually
 function setupArtistBackButton() {
     // Create back button if it doesn't exist
     let backButton = document.getElementById('back-button');
@@ -186,6 +186,7 @@ function displayTopTracks(tracks) {
 
     tracksContainer.innerHTML = '';
 
+    // using emojis for visuals
     tracks.forEach((track, index) => {
         const hasPreview = !!track.preview_url;
         const spotifyUrl = track.external_urls?.spotify || `https://open.spotify.com/track/${track.id}`;
@@ -207,7 +208,7 @@ function displayTopTracks(tracks) {
                     `<button class="icon-btn play-btn" data-preview="${track.preview_url}" title="Play 30-second preview">▶</button>` :
                     `<button class="icon-btn play-btn" disabled title="No preview available">▶</button>`
                 }
-                <button class="icon-btn spotify-btn" data-spotify="${spotifyUrl}" title="Listen on Spotify">🎵</button>
+                <button class="icon-btn spotify-btn" data-spotify="${spotifyUrl}" title="Listen on Spotify">🎵</button> 
                 <button class="icon-btn favorite-btn" title="Add to favorites">♥</button>
             </div>
         `;
@@ -219,11 +220,11 @@ function displayTopTracks(tracks) {
     initializeSpotifyButtons();
     initializeFavoriteButtons();
     
-    // QUICK FIX: Add track items animation directly here
+    
     animateTrackItems();
 }
 
-// NEW FUNCTION: Animate track items after they're loaded
+// Animate track items after they're loaded
 function animateTrackItems() {
     // Wait a brief moment for the DOM to update completely
     setTimeout(() => {
@@ -305,8 +306,8 @@ function playSpotifyPreview(previewUrl, button) {
         currentAudio = new Audio(previewUrl);
         currentButton = button;
         
-        // Show loading state
-        button.textContent = '⏳';
+        
+        button.textContent = 'Loading';
         
         currentAudio.addEventListener('canplay', () => {
             console.log('Preview audio can play');
@@ -324,12 +325,12 @@ function playSpotifyPreview(previewUrl, button) {
         });
 
         currentAudio.play().then(() => {
-            console.log('✅ Spotify preview playing!');
+            console.log('Spotify preview playing!');
             button.textContent = '⏸';
             button.closest('.track-item').classList.add('playing');
             showNowPlaying(button.closest('.track-item').querySelector('.track-title').textContent);
         }).catch(error => {
-            console.error('❌ Preview play failed:', error);
+            console.error('Preview play failed:', error);
             resetAudioState();
             showError('Could not play preview. Click the Spotify button to listen on Spotify.');
         });
@@ -377,7 +378,7 @@ function showNowPlaying(trackName) {
         document.body.appendChild(nowPlaying);
     }
     
-    nowPlaying.textContent = `🎵 Now Playing: ${trackName}`;
+    nowPlaying.textContent = ` Now Playing: ${trackName}`;
     nowPlaying.style.display = 'block';
 }
 

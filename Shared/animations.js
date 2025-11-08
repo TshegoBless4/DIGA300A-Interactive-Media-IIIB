@@ -421,7 +421,7 @@ class VibeCheckAnimations {
 
     
     static addSimpleTextAnimations() {
-        // Simple fade-in for mission text
+        // fade-in for mission text
         gsap.fromTo('.mission-section p',
             { opacity: 0, y: 20 },
             {
@@ -437,7 +437,7 @@ class VibeCheckAnimations {
             }
         );
 
-        // Simple bounce for feature card titles
+        // bounce for feature card titles
         gsap.fromTo('.feature-card h3',
             { scale: 0.8, opacity: 0 },
             {
@@ -453,7 +453,7 @@ class VibeCheckAnimations {
             }
         );
 
-        // Simple slide-in for step descriptions
+        // slide-in for step descriptions
         gsap.fromTo('.steps-list p',
             { x: -30, opacity: 0 },
             {
